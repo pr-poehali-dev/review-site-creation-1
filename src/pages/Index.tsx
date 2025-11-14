@@ -164,7 +164,7 @@ const Index = () => {
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Icon name="Star" size={24} className="text-yellow-400 fill-yellow-400" />
                 <span className="text-4xl font-bold text-primary">
-                  {stats.overall.avg_rating?.toFixed(1) || '0.0'}
+                  {stats.overall.avg_rating ? Number(stats.overall.avg_rating).toFixed(1) : '0.0'}
                 </span>
               </div>
               <div className="text-sm text-muted-foreground">Средний рейтинг</div>
@@ -180,7 +180,7 @@ const Index = () => {
                     size={20} 
                     className="text-primary"
                   />
-                  <span className="text-3xl font-bold text-primary">{cat.avg_rating.toFixed(1)}</span>
+                  <span className="text-3xl font-bold text-primary">{Number(cat.avg_rating).toFixed(1)}</span>
                 </div>
                 <div className="text-sm text-muted-foreground">
                   {CATEGORIES[cat.category as keyof typeof CATEGORIES].label}
