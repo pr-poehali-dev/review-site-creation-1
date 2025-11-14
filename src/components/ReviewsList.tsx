@@ -236,7 +236,7 @@ const ReviewsList = ({ reviews, loading, selectedCategory, onCategoryChange, onR
                 <>
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="font-heading font-semibold text-lg mb-1">
+                      <h3 className="font-heading font-semibold text-lg mb-1 text-gray-900">
                         {review.author_name}
                       </h3>
                       <Badge className={`${CATEGORIES[review.category].color} text-white`}>
@@ -250,11 +250,11 @@ const ReviewsList = ({ reviews, loading, selectedCategory, onCategoryChange, onR
                     </div>
                     <StarRating rating={review.rating} />
                   </div>
-                  <p className="text-muted-foreground font-body leading-relaxed mb-3">
+                  <p className="text-gray-700 font-body leading-relaxed mb-3">
                     {review.comment}
                   </p>
                   <div className="flex items-center justify-between">
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-gray-600">
                       {new Date(review.created_at).toLocaleDateString('ru-RU', {
                         year: 'numeric',
                         month: 'long',

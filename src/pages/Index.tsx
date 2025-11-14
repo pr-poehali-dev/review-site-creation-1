@@ -115,7 +115,7 @@ const Index = () => {
           <div className="grid md:grid-cols-4 gap-4 mb-12 animate-slide-up">
             <Card className="p-6 text-center bg-white/80 backdrop-blur shadow-lg hover:shadow-xl transition-shadow">
               <div className="text-4xl font-bold text-primary mb-2">{stats.overall.total}</div>
-              <div className="text-sm text-muted-foreground">Всего отзывов</div>
+              <div className="text-sm text-gray-600">Всего отзывов</div>
             </Card>
             <Card className="p-6 text-center bg-white/80 backdrop-blur shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-center gap-2 mb-2">
@@ -124,7 +124,7 @@ const Index = () => {
                   {stats.overall.avg_rating ? Number(stats.overall.avg_rating).toFixed(1) : '0.0'}
                 </span>
               </div>
-              <div className="text-sm text-muted-foreground">Средний рейтинг</div>
+              <div className="text-sm text-gray-600">Средний рейтинг</div>
             </Card>
             {stats.by_category.map((cat) => (
               <Card 
@@ -139,7 +139,7 @@ const Index = () => {
                   />
                   <span className="text-3xl font-bold text-primary">{Number(cat.avg_rating).toFixed(1)}</span>
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-gray-600">
                   {CATEGORIES[cat.category as keyof typeof CATEGORIES].label}
                 </div>
               </Card>

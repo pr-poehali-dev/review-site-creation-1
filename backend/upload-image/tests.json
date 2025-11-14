@@ -1,0 +1,11 @@
+{
+  "tests": [
+    {
+      "name": "Загрузка изображения без данных",
+      "method": "POST",
+      "path": "/",
+      "body": {},
+      "expectedStatus": 400
+    }
+  ]
+}

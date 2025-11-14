@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
 const PHOTOS_API_URL = 'https://functions.poehali.dev/1e82fac0-50d7-482a-b401-ca0044604ea4';
+const UPLOAD_API_URL = 'https://functions.poehali.dev/a969038d-1acb-412c-8896-55ad34fcc3f0';
 
 interface Photo {
   id: number;
@@ -18,7 +18,8 @@ const PhotoSlideshow = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [newPhotoUrl, setNewPhotoUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -39,23 +40,58 @@ const PhotoSlideshow = () => {
     }
   };
 
-  const handleAddPhoto = async () => {
-    if (!newPhotoUrl.trim()) return;
-    
-    try {
-      const response = await fetch(PHOTOS_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ photo_url: newPhotoUrl }),
-      });
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-      if (response.ok) {
-        toast({ title: 'Фото добавлено!' });
-        setNewPhotoUrl('');
-        fetchPhotos();
-      }
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Ошибка', description: 'Выберите изображение', variant: 'destructive' });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result as string;
+        const base64Data = base64.split(',')[1];
+
+        const uploadResponse = await fetch(UPLOAD_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: base64Data,
+            content_type: file.type,
+          }),
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const { url } = await uploadResponse.json();
+
+        const addResponse = await fetch(PHOTOS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ photo_url: url }),
+        });
+
+        if (addResponse.ok) {
+          toast({ title: 'Фото добавлено!' });
+          fetchPhotos();
+        }
+      };
+
+      reader.readAsDataURL(file);
     } catch (error) {
-      toast({ title: 'Ошибка', variant: 'destructive' });
+      toast({ title: 'Ошибка загрузки', variant: 'destructive' });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -118,14 +154,30 @@ const PhotoSlideshow = () => {
       {isAdmin && (
         <Card className="mt-4 p-4 max-w-md mx-auto bg-card">
           <div className="space-y-4">
-            <div className="flex gap-2">
-              <Input
-                placeholder="URL фото"
-                value={newPhotoUrl}
-                onChange={(e) => setNewPhotoUrl(e.target.value)}
+            <div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
               />
-              <Button onClick={handleAddPhoto}>
-                <Icon name="Plus" size={16} />
+              <Button 
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-full"
+              >
+                {uploading ? (
+                  <>
+                    <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+                    Загрузка...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="Upload" size={16} className="mr-2" />
+                    Загрузить фото
+                  </>
+                )}
               </Button>
             </div>
             <div className="space-y-2">
