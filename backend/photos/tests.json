@@ -1,0 +1,19 @@
+{
+  "tests": [
+    {
+      "name": "Получение списка фотографий",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Добавление фотографии",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "photo_url": "https://example.com/photo.jpg"
+      },
+      "expectedStatus": 201
+    }
+  ]
+}

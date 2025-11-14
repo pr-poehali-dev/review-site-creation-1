@@ -10,6 +10,150 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
 const API_URL = 'https://functions.poehali.dev/38865f03-54d2-48a6-9bd4-89d24a63cbfc';
+const PHOTOS_API_URL = 'https://functions.poehali.dev/1e82fac0-50d7-482a-b401-ca0044604ea4';
+
+interface Photo {
+  id: number;
+  photo_url: string;
+  display_order: number;
+  created_at: string;
+}
+
+const PhotoSlideshow = () => {
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [newPhotoUrl, setNewPhotoUrl] = useState('');
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchPhotos();
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % (photos.length || 1));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [photos.length]);
+
+  const fetchPhotos = async () => {
+    try {
+      const response = await fetch(PHOTOS_API_URL);
+      const data = await response.json();
+      setPhotos(data.photos);
+    } catch (error) {
+      console.error('Failed to fetch photos:', error);
+    }
+  };
+
+  const handleAddPhoto = async () => {
+    if (!newPhotoUrl.trim()) return;
+    
+    try {
+      const response = await fetch(PHOTOS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photo_url: newPhotoUrl }),
+      });
+
+      if (response.ok) {
+        toast({ title: 'Фото добавлено!' });
+        setNewPhotoUrl('');
+        fetchPhotos();
+      }
+    } catch (error) {
+      toast({ title: 'Ошибка', variant: 'destructive' });
+    }
+  };
+
+  const handleDeletePhoto = async (id: number) => {
+    try {
+      const response = await fetch(`${PHOTOS_API_URL}?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        toast({ title: 'Фото удалено!' });
+        fetchPhotos();
+      }
+    } catch (error) {
+      toast({ title: 'Ошибка', variant: 'destructive' });
+    }
+  };
+
+  if (photos.length === 0) {
+    return (
+      <div className="mb-8">
+        <div className="w-48 h-48 rounded-full mx-auto bg-muted flex items-center justify-center">
+          <Icon name="User" size={64} className="text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-8">
+      <div className="relative w-48 h-48 mx-auto">
+        <img
+          src={photos[currentIndex]?.photo_url}
+          alt="Profile"
+          className="w-48 h-48 rounded-full object-cover border-4 border-primary shadow-2xl animate-fade-in"
+        />
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
+          {photos.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              className={`w-2 h-2 rounded-full transition-all ${
+                idx === currentIndex ? 'bg-primary w-4' : 'bg-muted'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+      
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setIsAdmin(!isAdmin)}
+        className="mt-4 text-muted-foreground"
+      >
+        <Icon name={isAdmin ? 'EyeOff' : 'Eye'} size={16} className="mr-2" />
+        {isAdmin ? 'Скрыть управление' : 'Управление фото'}
+      </Button>
+
+      {isAdmin && (
+        <Card className="mt-4 p-4 max-w-md mx-auto bg-card">
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Input
+                placeholder="URL фото"
+                value={newPhotoUrl}
+                onChange={(e) => setNewPhotoUrl(e.target.value)}
+              />
+              <Button onClick={handleAddPhoto}>
+                <Icon name="Plus" size={16} />
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {photos.map((photo) => (
+                <div key={photo.id} className="flex items-center gap-2 p-2 bg-muted rounded">
+                  <img src={photo.photo_url} alt="" className="w-12 h-12 rounded object-cover" />
+                  <span className="text-sm flex-1 truncate text-foreground">{photo.photo_url}</span>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleDeletePhoto(photo.id)}
+                  >
+                    <Icon name="Trash2" size={14} />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+};
 
 interface Review {
   id: number;
@@ -149,25 +293,19 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-orange-50">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-12 max-w-6xl">
         <header className="text-center mb-16 animate-fade-in">
-          <div className="mb-8">
-            <img 
-              src="https://cdn.poehali.dev/projects/0556feb8-1a00-42ae-aa31-bfbbae2b3619/files/2933d28c-48fc-48b0-8ba6-d029883d5cf8.jpg" 
-              alt="Фото профиля"
-              className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-primary shadow-xl"
-            />
-          </div>
+          <PhotoSlideshow />
           <h1 className="text-5xl md:text-6xl font-heading font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
             Отзывы обо мне
           </h1>
-          <p className="text-xl text-muted-foreground font-body mb-6">
+          <p className="text-xl text-foreground/80 font-body mb-6">
             Ваше мнение помогает мне становиться лучше
           </p>
-          <div className="flex gap-4 justify-center items-center">
+          <div className="flex gap-4 justify-center items-center flex-wrap">
             <a 
-              href="https://t.me/yourusername" 
+              href="https://t.me/Nikitaminkov" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full hover:shadow-lg transition-all hover:-translate-y-1"
@@ -176,22 +314,13 @@ const Index = () => {
               Telegram
             </a>
             <a 
-              href="https://vk.com/yourusername" 
+              href="https://vk.com/nikitaminkov" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-full hover:shadow-lg transition-all hover:-translate-y-1"
             >
               <Icon name="Users" size={20} />
               VK
-            </a>
-            <a 
-              href="https://instagram.com/yourusername" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-full hover:shadow-lg transition-all hover:-translate-y-1"
-            >
-              <Icon name="Instagram" size={20} />
-              Instagram
             </a>
           </div>
         </header>
