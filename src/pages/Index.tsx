@@ -46,15 +46,21 @@ const StarRating = ({ rating, interactive = false, onChange }: {
   return (
     <div className="flex gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
-        <Icon
+        <button
           key={star}
-          name={star <= rating ? 'Star' : 'Star'}
-          size={interactive ? 28 : 20}
-          className={`${
-            star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-          } ${interactive ? 'cursor-pointer transition-transform hover:scale-110' : ''}`}
+          type="button"
           onClick={() => interactive && onChange?.(star)}
-        />
+          className="focus:outline-none"
+          disabled={!interactive}
+        >
+          <Icon
+            name="Star"
+            size={interactive ? 28 : 20}
+            className={`${
+              star <= rating ? 'fill-yellow-400 text-yellow-400' : 'fill-none text-gray-300'
+            } ${interactive ? 'cursor-pointer transition-transform hover:scale-110' : ''}`}
+          />
+        </button>
       ))}
     </div>
   );
@@ -146,12 +152,48 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-orange-50">
       <div className="container mx-auto px-4 py-12 max-w-6xl">
         <header className="text-center mb-16 animate-fade-in">
+          <div className="mb-8">
+            <img 
+              src="https://cdn.poehali.dev/projects/0556feb8-1a00-42ae-aa31-bfbbae2b3619/files/2933d28c-48fc-48b0-8ba6-d029883d5cf8.jpg" 
+              alt="Фото профиля"
+              className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-primary shadow-xl"
+            />
+          </div>
           <h1 className="text-5xl md:text-6xl font-heading font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
             Отзывы обо мне
           </h1>
-          <p className="text-xl text-muted-foreground font-body">
+          <p className="text-xl text-muted-foreground font-body mb-6">
             Ваше мнение помогает мне становиться лучше
           </p>
+          <div className="flex gap-4 justify-center items-center">
+            <a 
+              href="https://t.me/yourusername" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full hover:shadow-lg transition-all hover:-translate-y-1"
+            >
+              <Icon name="Send" size={20} />
+              Telegram
+            </a>
+            <a 
+              href="https://vk.com/yourusername" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-full hover:shadow-lg transition-all hover:-translate-y-1"
+            >
+              <Icon name="Users" size={20} />
+              VK
+            </a>
+            <a 
+              href="https://instagram.com/yourusername" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-full hover:shadow-lg transition-all hover:-translate-y-1"
+            >
+              <Icon name="Instagram" size={20} />
+              Instagram
+            </a>
+          </div>
         </header>
 
         {!loading && stats && (
