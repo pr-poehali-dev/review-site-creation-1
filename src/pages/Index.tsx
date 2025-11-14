@@ -6,6 +6,7 @@ import PhotoSlideshow from '@/components/PhotoSlideshow';
 import AboutMeSection from '@/components/AboutMeSection';
 import ReviewsList from '@/components/ReviewsList';
 import ReviewForm from '@/components/ReviewForm';
+import PhotoGallery from '@/components/PhotoGallery';
 
 const API_URL = 'https://functions.poehali.dev/38865f03-54d2-48a6-9bd4-89d24a63cbfc';
 
@@ -148,14 +149,18 @@ const Index = () => {
         )}
 
         <Tabs defaultValue="reviews" className="mb-12">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="reviews" className="text-lg">
               <Icon name="MessageSquare" size={20} className="mr-2" />
-              Все отзывы
+              Отзывы
             </TabsTrigger>
             <TabsTrigger value="add" className="text-lg">
               <Icon name="PenLine" size={20} className="mr-2" />
-              Оставить отзыв
+              Добавить
+            </TabsTrigger>
+            <TabsTrigger value="gallery" className="text-lg">
+              <Icon name="Image" size={20} className="mr-2" />
+              Фото
             </TabsTrigger>
             <TabsTrigger value="about" className="text-lg">
               <Icon name="User" size={20} className="mr-2" />
@@ -175,6 +180,10 @@ const Index = () => {
 
           <TabsContent value="add">
             <ReviewForm onReviewAdded={handleReviewAdded} />
+          </TabsContent>
+
+          <TabsContent value="gallery">
+            <PhotoGallery />
           </TabsContent>
 
           <TabsContent value="about">

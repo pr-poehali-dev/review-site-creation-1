@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import ImageUpload from '@/components/ImageUpload';
 
 const API_URL = 'https://functions.poehali.dev/38865f03-54d2-48a6-9bd4-89d24a63cbfc';
 
@@ -154,17 +155,13 @@ const ReviewForm = ({ onReviewAdded }: ReviewFormProps) => {
         </div>
 
         <div>
-          <Label htmlFor="photo_url" className="text-lg font-heading">
+          <Label className="text-lg font-heading mb-3 block">
             Фото (необязательно)
           </Label>
-          <Input
-            id="photo_url"
+          <ImageUpload
             value={formData.photo_url}
-            onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
-            placeholder="Ссылка на фото (например, с imgur.com)"
-            className="mt-2"
+            onChange={(url) => setFormData({ ...formData, photo_url: url })}
           />
-          <p className="text-xs text-gray-600 mt-1">💡 Загрузите фото на imgur.com и вставьте ссылку</p>
         </div>
 
         <Button 

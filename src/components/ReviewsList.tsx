@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import ImageUpload from '@/components/ImageUpload';
 
 const API_URL = 'https://functions.poehali.dev/38865f03-54d2-48a6-9bd4-89d24a63cbfc';
 
@@ -225,6 +226,11 @@ const ReviewsList = ({ reviews, loading, selectedCategory, onCategoryChange, onR
                     onChange={(e) => setEditFormData({ ...editFormData, comment: e.target.value })}
                     placeholder="Комментарий"
                     className="min-h-24"
+                  />
+                  <ImageUpload
+                    value={editFormData.photo_url}
+                    onChange={(url) => setEditFormData({ ...editFormData, photo_url: url })}
+                    maxSizeMB={2}
                   />
                   <div className="flex gap-2">
                     <Button onClick={() => handleUpdateReview(review.id)} className="flex-1">
