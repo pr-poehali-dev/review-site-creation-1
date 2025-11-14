@@ -201,8 +201,13 @@ const StarRating = ({ rating, interactive = false, onChange }: {
             name="Star"
             size={interactive ? 28 : 20}
             className={`${
-              star <= rating ? 'fill-yellow-400 text-yellow-400' : 'fill-none text-gray-300'
+              star <= rating ? 'fill-yellow-400 text-yellow-400' : 'fill-none text-gray-500'
             } ${interactive ? 'cursor-pointer transition-transform hover:scale-110' : ''}`}
+            style={{ 
+              filter: star <= rating 
+                ? 'drop-shadow(0 0 2px rgba(0,0,0,0.5))' 
+                : 'drop-shadow(0 0 1px rgba(255,255,255,0.3))'
+            }}
           />
         </button>
       ))}
@@ -362,7 +367,7 @@ const Index = () => {
         )}
 
         <Tabs defaultValue="reviews" className="mb-12">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="reviews" className="text-lg">
               <Icon name="MessageSquare" size={20} className="mr-2" />
               Все отзывы
@@ -370,6 +375,10 @@ const Index = () => {
             <TabsTrigger value="add" className="text-lg">
               <Icon name="PenLine" size={20} className="mr-2" />
               Оставить отзыв
+            </TabsTrigger>
+            <TabsTrigger value="about" className="text-lg">
+              <Icon name="User" size={20} className="mr-2" />
+              Обо мне
             </TabsTrigger>
           </TabsList>
 
@@ -512,9 +521,95 @@ const Index = () => {
               </form>
             </Card>
           </TabsContent>
+
+          <TabsContent value="about">
+            <AboutMeSection />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
+  );
+};
+
+const AboutMeSection = () => {
+  const [content, setContent] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState('');
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchAbout();
+  }, []);
+
+  const fetchAbout = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/39b79711-656f-4a27-a996-49c516b0778a');
+      const data = await response.json();
+      setContent(data.content);
+      setEditedContent(data.content);
+    } catch (error) {
+      console.error('Failed to fetch about:', error);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/39b79711-656f-4a27-a996-49c516b0778a', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: editedContent }),
+      });
+
+      if (response.ok) {
+        setContent(editedContent);
+        setIsEditing(false);
+        toast({ title: 'Текст обновлён!' });
+      }
+    } catch (error) {
+      toast({ title: 'Ошибка', variant: 'destructive' });
+    }
+  };
+
+  return (
+    <Card className="p-8 bg-card max-w-3xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-heading font-bold text-foreground">Обо мне</h2>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            if (isEditing) {
+              setEditedContent(content);
+            }
+            setIsEditing(!isEditing);
+          }}
+        >
+          <Icon name={isEditing ? 'X' : 'Pencil'} size={16} className="mr-2" />
+          {isEditing ? 'Отмена' : 'Редактировать'}
+        </Button>
+      </div>
+
+      {isEditing ? (
+        <div className="space-y-4">
+          <Textarea
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+            className="min-h-48 text-base"
+            placeholder="Расскажите о себе..."
+          />
+          <Button onClick={handleSave} className="w-full">
+            <Icon name="Save" size={16} className="mr-2" />
+            Сохранить
+          </Button>
+        </div>
+      ) : (
+        <div className="prose prose-invert max-w-none">
+          <p className="text-foreground/90 text-lg leading-relaxed whitespace-pre-wrap">
+            {content}
+          </p>
+        </div>
+      )}
+    </Card>
   );
 };
 

@@ -1,0 +1,19 @@
+{
+  "tests": [
+    {
+      "name": "Получение текста обо мне",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Обновление текста обо мне",
+      "method": "PUT",
+      "path": "/",
+      "body": {
+        "content": "Обновленный текст обо мне"
+      },
+      "expectedStatus": 200
+    }
+  ]
+}
