@@ -57,6 +57,7 @@ const ReviewForm = ({ onReviewAdded }: ReviewFormProps) => {
     category: 'work',
     rating: 0,
     comment: '',
+    photo_url: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,7 +84,7 @@ const ReviewForm = ({ onReviewAdded }: ReviewFormProps) => {
           title: 'Отзыв добавлен!',
           description: 'Спасибо за ваш отзыв',
         });
-        setFormData({ author_name: '', category: 'work', rating: 0, comment: '' });
+        setFormData({ author_name: '', category: 'work', rating: 0, comment: '', photo_url: '' });
         onReviewAdded();
       }
     } catch (error) {
@@ -150,6 +151,20 @@ const ReviewForm = ({ onReviewAdded }: ReviewFormProps) => {
             placeholder="Расскажите подробнее о вашем опыте..."
             className="mt-2 min-h-32"
           />
+        </div>
+
+        <div>
+          <Label htmlFor="photo_url" className="text-lg font-heading">
+            Фото (необязательно)
+          </Label>
+          <Input
+            id="photo_url"
+            value={formData.photo_url}
+            onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
+            placeholder="Ссылка на фото (например, с imgur.com)"
+            className="mt-2"
+          />
+          <p className="text-xs text-gray-600 mt-1">💡 Загрузите фото на imgur.com и вставьте ссылку</p>
         </div>
 
         <Button 

@@ -91,6 +91,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             category = body_data.get('category', '').strip()
             rating = body_data.get('rating')
             comment = body_data.get('comment', '').strip()
+            photo_url = body_data.get('photo_url', '').strip() or None
             
             if not all([author_name, category, rating, comment]):
                 return {
@@ -115,11 +116,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             cur.execute(
                 """
-                INSERT INTO reviews (author_name, category, rating, comment)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO reviews (author_name, category, rating, comment, photo_url)
+                VALUES (%s, %s, %s, %s, %s)
                 RETURNING *
                 """,
-                (author_name, category, rating, comment)
+                (author_name, category, rating, comment, photo_url)
             )
             
             new_review = cur.fetchone()
@@ -151,6 +152,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             category = body_data.get('category', '').strip()
             rating = body_data.get('rating')
             comment = body_data.get('comment', '').strip()
+            photo_url = body_data.get('photo_url', '').strip() or None
             
             if not all([author_name, category, rating, comment]):
                 return {
@@ -176,11 +178,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute(
                 """
                 UPDATE reviews 
-                SET author_name = %s, category = %s, rating = %s, comment = %s
+                SET author_name = %s, category = %s, rating = %s, comment = %s, photo_url = %s
                 WHERE id = %s
                 RETURNING *
                 """,
-                (author_name, category, rating, comment, review_id)
+                (author_name, category, rating, comment, photo_url, review_id)
             )
             
             updated_review = cur.fetchone()

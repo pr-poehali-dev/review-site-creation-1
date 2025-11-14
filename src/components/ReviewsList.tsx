@@ -16,6 +16,7 @@ interface Review {
   rating: number;
   comment: string;
   created_at: string;
+  photo_url?: string;
 }
 
 const CATEGORIES = {
@@ -83,6 +84,7 @@ const ReviewsList = ({ reviews, loading, selectedCategory, onCategoryChange, onR
     category: 'work',
     rating: 0,
     comment: '',
+    photo_url: '',
   });
   const { toast } = useToast();
 
@@ -93,6 +95,7 @@ const ReviewsList = ({ reviews, loading, selectedCategory, onCategoryChange, onR
       category: review.category,
       rating: review.rating,
       comment: review.comment,
+      photo_url: review.photo_url || '',
     });
   };
 
@@ -103,6 +106,7 @@ const ReviewsList = ({ reviews, loading, selectedCategory, onCategoryChange, onR
       category: 'work',
       rating: 0,
       comment: '',
+      photo_url: '',
     });
   };
 
@@ -250,6 +254,15 @@ const ReviewsList = ({ reviews, loading, selectedCategory, onCategoryChange, onR
                     </div>
                     <StarRating rating={review.rating} />
                   </div>
+                  {review.photo_url && (
+                    <div className="mb-3">
+                      <img 
+                        src={review.photo_url} 
+                        alt="Фото от автора" 
+                        className="w-full max-h-64 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
                   <p className="text-gray-700 font-body leading-relaxed mb-3">
                     {review.comment}
                   </p>
