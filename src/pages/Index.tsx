@@ -169,6 +169,7 @@ const Index = () => {
               loading={loading}
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
+              onReviewUpdated={handleReviewAdded}
             />
           </TabsContent>
 

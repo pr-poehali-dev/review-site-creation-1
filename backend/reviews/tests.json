@@ -23,6 +23,12 @@
         "comment": "Отличная работа!"
       },
       "expectedStatus": 201
+    },
+    {
+      "name": "Удаление несуществующего отзыва",
+      "method": "DELETE",
+      "path": "/?id=99999",
+      "expectedStatus": 404
     }
   ]
 }
