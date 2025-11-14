@@ -9,10 +9,46 @@ interface ImageUploadProps {
   maxSizeMB?: number;
 }
 
-const ImageUpload = ({ value, onChange, maxSizeMB = 2 }: ImageUploadProps) => {
+const ImageUpload = ({ value, onChange, maxSizeMB = 0.5 }: ImageUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          const maxDimension = 800;
+          if (width > height && width > maxDimension) {
+            height = (height * maxDimension) / width;
+            width = maxDimension;
+          } else if (height > maxDimension) {
+            width = (width * maxDimension) / height;
+            height = maxDimension;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(compressedBase64);
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -23,37 +59,19 @@ const ImageUpload = ({ value, onChange, maxSizeMB = 2 }: ImageUploadProps) => {
       return;
     }
 
-    const maxSizeBytes = maxSizeMB * 1024 * 1024;
-    if (file.size > maxSizeBytes) {
-      toast({ 
-        title: 'Файл слишком большой', 
-        description: `Максимальный размер: ${maxSizeMB}МБ`,
-        variant: 'destructive' 
-      });
-      return;
-    }
-
     setUploading(true);
 
     try {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result as string;
-        onChange(base64);
-        setUploading(false);
-      };
-      reader.onerror = () => {
-        toast({ title: 'Ошибка загрузки', variant: 'destructive' });
-        setUploading(false);
-      };
-      reader.readAsDataURL(file);
+      const compressed = await compressImage(file);
+      onChange(compressed);
+      toast({ title: 'Фото загружено!', description: 'Изображение оптимизировано' });
     } catch (error) {
-      toast({ title: 'Ошибка', variant: 'destructive' });
+      toast({ title: 'Ошибка загрузки', variant: 'destructive' });
+    } finally {
       setUploading(false);
-    }
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -100,7 +118,7 @@ const ImageUpload = ({ value, onChange, maxSizeMB = 2 }: ImageUploadProps) => {
           ) : (
             <>
               <Icon name="Upload" size={20} className="mr-2" />
-              Загрузить фото (макс. {maxSizeMB}МБ)
+              Загрузить фото
             </>
           )}
         </Button>

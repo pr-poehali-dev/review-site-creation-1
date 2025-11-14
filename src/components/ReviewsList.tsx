@@ -230,7 +230,6 @@ const ReviewsList = ({ reviews, loading, selectedCategory, onCategoryChange, onR
                   <ImageUpload
                     value={editFormData.photo_url}
                     onChange={(url) => setEditFormData({ ...editFormData, photo_url: url })}
-                    maxSizeMB={2}
                   />
                   <div className="flex gap-2">
                     <Button onClick={() => handleUpdateReview(review.id)} className="flex-1">
