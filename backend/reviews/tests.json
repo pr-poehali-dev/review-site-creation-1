@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "Получение списка отзывов",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Получение статистики",
+      "method": "GET",
+      "path": "/?action=stats",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Создание отзыва",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "author_name": "Тестовый пользователь",
+        "category": "work",
+        "rating": 5,
+        "comment": "Отличная работа!"
+      },
+      "expectedStatus": 201
+    }
+  ]
+}
